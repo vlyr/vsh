@@ -7,8 +7,11 @@ use crossterm::{
     ExecutableCommand,
 };
 
+use std::fmt;
+use std::io::{self, Stdout};
+
 fn main() {
-    let mut stdout = std::io::stdout();
+    let mut stdout = io::stdout();
     enable_raw_mode().unwrap();
 
     let mut cmdbuf = String::new();
@@ -25,12 +28,37 @@ fn main() {
                 Event::Key(k) => match k.code {
                     KeyCode::Enter => {
                         execute!(stdout, cursor::MoveToColumn(1), Print("\n")).unwrap();
+                        if cmdbuf.is_empty() {
+                            continue 'cmdloop;
+                        }
 
-                        std::process::Command::new(&cmdbuf)
+                        let mut args = cmdbuf.trim().split_whitespace();
+                        let cmd = args.next().unwrap();
+
+                        // Disabling raw mode is required in order for commands to function
+                        // normally
+                        if let Err(e) = disable_raw_mode() {
+                            error_handler(
+                                &mut stdout,
+                                &format!("Failed enabling raw mode after command execution: {}", e),
+                            );
+                            continue 'cmdloop;
+                        }
+
+                        std::process::Command::new(&cmd)
+                            .args(&mut args)
                             .spawn()
                             .unwrap()
                             .wait()
                             .unwrap();
+
+                        if let Err(e) = enable_raw_mode() {
+                            error_handler(
+                                &mut stdout,
+                                &format!("Failed enabling raw mode after command execution: {}", e),
+                            );
+                        }
+
                         break 'keyloop;
                     }
 
@@ -61,5 +89,21 @@ fn main() {
         }
     }
 
-    disable_raw_mode().unwrap();
+    if let Err(e) = disable_raw_mode() {
+        error_handler(
+            &mut stdout,
+            &format!("Failed disabling raw mode on shell exit: {}", e),
+        );
+    }
+}
+
+fn error_handler<T: fmt::Display>(stdout: &mut Stdout, msg: &T) {
+    execute!(
+        stdout,
+        Print("\n"),
+        Print(msg),
+        Print("\n"),
+        cursor::MoveToColumn(1)
+    )
+    .unwrap();
 }

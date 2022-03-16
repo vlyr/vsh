@@ -1,9 +1,9 @@
 use std::env;
 use std::error::Error;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 pub struct Context {
-    current_dir: PathBuf, // or Path?
+    current_dir: PathBuf,
     command_buffer: String,
 }
 
@@ -21,8 +21,12 @@ impl Context {
         &self.current_dir
     }
 
-    pub fn set_current_dir(&mut self, dir: String) -> Result<(), Box<dyn Error>> {
-        unimplemented!()
+    pub fn set_current_dir(&mut self, dir: String) {
+        let path = Path::new(&dir).to_path_buf();
+
+        if path.exists() && path.is_dir() {
+            self.current_dir = path;
+        }
     }
 
     pub fn command_buffer(&self) -> &String {

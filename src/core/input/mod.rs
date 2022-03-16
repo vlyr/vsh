@@ -1,5 +1,5 @@
 use crate::core::utils::error_handler;
-use crate::core::Context;
+use crate::core::{command::execute as execute_command, Context};
 use crossterm::event::KeyEvent;
 use crossterm::{
     cursor, execute,
@@ -49,10 +49,6 @@ pub fn handle_key(
 
             match cmd {
                 Some(cmd) => {
-                    if cmd == "exit" {
-                        return Ok(Exit);
-                    }
-
                     // Disabling raw mode is required in order for commands to function
                     // normally
                     if let Err(e) = disable_raw_mode() {
@@ -64,10 +60,7 @@ pub fn handle_key(
                         return Ok(NextCommand);
                     }
 
-                    std::process::Command::new(&cmd)
-                        .args(&mut args)
-                        .spawn()?
-                        .wait()?;
+                    let ret_status = execute_command(cmd, args)?;
 
                     if let Err(e) = enable_raw_mode() {
                         error_handler(
@@ -76,13 +69,11 @@ pub fn handle_key(
                         );
                     }
 
-                    Ok(NextCommand)
+                    Ok(ret_status)
                 }
 
                 None => Ok(NextCommand),
             }
-
-            // break 'keyloop; || continue 'cmdloop;
         }
         _ => Ok(NextKey),
     }

@@ -35,6 +35,10 @@ fn main() {
                         let mut args = cmdbuf.trim().split_whitespace();
                         let cmd = args.next().unwrap();
 
+                        if cmd == "exit" {
+                            break 'cmdloop;
+                        }
+
                         // Disabling raw mode is required in order for commands to function
                         // normally
                         if let Err(e) = disable_raw_mode() {

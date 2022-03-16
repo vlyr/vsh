@@ -4,6 +4,7 @@ use std::path::PathBuf;
 
 pub struct Context {
     current_dir: PathBuf, // or Path?
+    command_buffer: String,
 }
 
 impl Context {
@@ -11,12 +12,25 @@ impl Context {
         let home_dir = env::current_dir()?;
 
         Ok(Self {
+            command_buffer: String::new(),
             current_dir: home_dir,
         })
     }
 
     pub fn current_dir(&self) -> &PathBuf {
         &self.current_dir
+    }
+
+    pub fn set_current_dir(&mut self, dir: String) -> Result<(), Box<dyn Error>> {
+        unimplemented!()
+    }
+
+    pub fn command_buffer(&self) -> &String {
+        &self.command_buffer
+    }
+
+    pub fn command_buffer_mut(&mut self) -> &mut String {
+        &mut self.command_buffer
     }
 
     pub fn current_dir_str(&self) -> String {

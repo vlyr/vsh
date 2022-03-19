@@ -1,5 +1,9 @@
 use crate::core::utils::error_handler;
-use crate::core::{command::execute as execute_command, Context};
+use crate::core::{
+    command::execute as execute_command,
+    completion::{show_completions, CompletionType},
+    Context,
+};
 use crossterm::event::KeyEvent;
 use crossterm::{
     cursor, execute,
@@ -38,6 +42,11 @@ pub fn handle_key(
         Key::Backspace => {
             context.command_buffer_mut().pop();
             stdout.execute(cursor::MoveLeft(1))?;
+            Ok(NextKey)
+        }
+
+        Key::Tab => {
+            show_completions(stdout, context.command_buffer(), CompletionType::Files)?;
             Ok(NextKey)
         }
 

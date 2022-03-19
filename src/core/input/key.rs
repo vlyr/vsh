@@ -6,6 +6,7 @@ pub enum Key {
     Backspace,
     Enter,
     Escape,
+    Tab,
     Up,
     Right,
     Down,
@@ -29,6 +30,10 @@ impl From<KeyEvent> for Key {
                 code: KeyCode::Backspace,
                 ..
             } => Key::Backspace,
+
+            KeyEvent {
+                code: KeyCode::Tab, ..
+            } => Key::Tab,
 
             KeyEvent {
                 code: KeyCode::Up, ..

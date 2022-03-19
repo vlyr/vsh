@@ -1,14 +1,13 @@
 use crossterm::{
     cursor,
-    event::{read, Event, KeyCode},
+    event::{read, Event},
     execute,
     style::Print,
     terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
-    ExecutableCommand,
 };
 
 use std::error::Error;
-use std::io::{self, Stdout};
+use std::io;
 use vsh::core::{
     input::{handle_key, LoopControl},
     utils::error_handler,
@@ -26,7 +25,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         execute!(stdout, cursor::MoveToColumn(1), Print(&prompt)).unwrap();
         context.command_buffer_mut().clear();
 
-        'keyloop: loop {
+        loop {
             let event = read().unwrap();
 
             match event {

@@ -26,6 +26,7 @@ impl Context {
 
         if path.exists() && path.is_dir() {
             self.current_dir = path;
+            std::env::set_current_dir(dir).unwrap();
         }
     }
 

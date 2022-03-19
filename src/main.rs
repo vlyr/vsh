@@ -6,11 +6,12 @@ use crossterm::{
     terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
 };
 
+use std::env;
 use std::error::Error;
 use std::io;
 use vsh::core::{
     input::{handle_key, LoopControl},
-    utils::error_handler,
+    utils::{error_handler, format_path},
     Context,
 };
 
@@ -21,7 +22,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     enable_raw_mode().unwrap();
 
     'cmdloop: loop {
-        let prompt = format!("{} | ", context.current_dir_str());
+        let current_dir = format_path(env::current_dir()?.to_str().unwrap());
+        let prompt = format!("{} | ", current_dir);
         execute!(stdout, cursor::MoveToColumn(1), Print(&prompt)).unwrap();
         context.command_buffer_mut().clear();
 

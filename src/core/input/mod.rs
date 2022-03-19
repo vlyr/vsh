@@ -43,7 +43,8 @@ pub fn handle_key(
 
         Key::Enter => {
             execute!(stdout, cursor::MoveToColumn(1), Print("\n"))?;
-            let mut args = context.command_buffer().trim().split_whitespace();
+            let command_buffer = context.command_buffer().clone();
+            let mut args = command_buffer.trim().split_whitespace();
 
             let cmd = args.next();
 
@@ -60,7 +61,7 @@ pub fn handle_key(
                         return Ok(NextCommand);
                     }
 
-                    let ret_status = execute_command(cmd, args)?;
+                    let ret_status = execute_command(cmd, args, context)?;
 
                     if let Err(e) = enable_raw_mode() {
                         error_handler(

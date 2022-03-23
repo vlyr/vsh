@@ -1,8 +1,5 @@
-use crate::core::utils::error_handler;
 use crate::core::{
-    command::execute as execute_command,
-    completion::{show_completions, CompletionType},
-    Context,
+    command::execute as execute_command, context::CompletionState, utils::error_handler, Context,
 };
 use crossterm::event::KeyEvent;
 use crossterm::{
@@ -46,7 +43,13 @@ pub fn handle_key(
         }
 
         Key::Tab => {
-            show_completions(stdout, context.command_buffer(), CompletionType::Files)?;
+            match context.completion_state() {
+                &CompletionState::Active(ref _state) => (),
+                &CompletionState::Inactive => {
+                    context.completion_state_mut().dir_completions();
+                    context.print_completions(stdout);
+                }
+            }
             Ok(NextKey)
         }
 

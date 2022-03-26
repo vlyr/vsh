@@ -11,6 +11,9 @@ pub fn execute<'a, 'b>(
         return Ok(LoopControl::NextCommand);
     }
 
+    context.command_buffer_mut().clear();
+    context.completion_state_mut().reset();
+
     match cmd {
         "cd" => match args.next() {
             Some(p) => {
@@ -33,6 +36,7 @@ pub fn execute<'a, 'b>(
                 Ok(mut handle) => {
                     handle.wait()?;
                 }
+
                 Err(e) => {
                     let mut stdout = std::io::stdout();
                     error_handler(&mut stdout, &format!("Failed executing command: {}", e));

@@ -5,7 +5,7 @@ use crossterm::event::KeyEvent;
 use crossterm::{
     cursor, execute,
     style::Print,
-    terminal::{disable_raw_mode, enable_raw_mode},
+    terminal::{disable_raw_mode, enable_raw_mode, Clear, ClearType},
     ExecutableCommand,
 };
 use std::error::Error;
@@ -54,7 +54,12 @@ pub fn handle_key(
         }
 
         Key::Enter => {
-            execute!(stdout, cursor::MoveToColumn(1), Print("\n"))?;
+            execute!(
+                stdout,
+                cursor::MoveToColumn(1),
+                Print("\n"),
+                Clear(ClearType::CurrentLine)
+            )?;
             let command_buffer = context.command_buffer().clone();
             let mut args = command_buffer.trim().split_whitespace();
 

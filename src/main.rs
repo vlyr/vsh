@@ -26,10 +26,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         let current_dir = format_path(env::current_dir()?.to_str().unwrap());
         let prompt = format!("{} | ", current_dir);
 
-        if let CompletionState::Inactive = context.completion_state() {
-            execute!(stdout, cursor::MoveToColumn(1), Print(&prompt)).unwrap();
-            context.command_buffer_mut().clear();
-        }
+        execute!(stdout, cursor::MoveToColumn(1), Print(&prompt)).unwrap();
 
         loop {
             let event = read().unwrap();

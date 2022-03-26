@@ -65,6 +65,10 @@ impl CompletionState {
         mem::swap(self, &mut new);
     }
 
+    pub fn reset(&mut self) {
+        mem::swap(self, &mut CompletionState::Inactive);
+    }
+
     pub fn dir_completions(&mut self) {
         let path = std::env::current_dir().unwrap();
 

@@ -10,6 +10,7 @@ use std::env;
 use std::error::Error;
 use std::io;
 use vsh::core::{
+    completion::CompletionState,
     input::{handle_key, LoopControl},
     utils::{error_handler, format_path},
     Context,
@@ -24,8 +25,11 @@ fn main() -> Result<(), Box<dyn Error>> {
     'cmdloop: loop {
         let current_dir = format_path(env::current_dir()?.to_str().unwrap());
         let prompt = format!("{} | ", current_dir);
-        execute!(stdout, cursor::MoveToColumn(1), Print(&prompt)).unwrap();
-        context.command_buffer_mut().clear();
+
+        if let CompletionState::Inactive = context.completion_state() {
+            execute!(stdout, cursor::MoveToColumn(1), Print(&prompt)).unwrap();
+            context.command_buffer_mut().clear();
+        }
 
         loop {
             let event = read().unwrap();

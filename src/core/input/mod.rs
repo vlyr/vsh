@@ -1,5 +1,5 @@
 use crate::core::{
-    command::execute as execute_command, context::CompletionState, utils::error_handler, Context,
+    command::execute as execute_command, completion::CompletionState, utils::error_handler, Context,
 };
 use crossterm::event::KeyEvent;
 use crossterm::{

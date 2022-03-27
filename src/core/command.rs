@@ -30,7 +30,9 @@ pub fn execute<'a, 'b>(
                 Ok(LoopControl::NextCommand)
             }
         },
+
         "exit" => Ok(LoopControl::Exit),
+
         _ => {
             match Command::new(&cmd).args(&mut args).spawn() {
                 Ok(mut handle) => {
@@ -42,6 +44,7 @@ pub fn execute<'a, 'b>(
                     error_handler(&mut stdout, &format!("Failed executing command: {}", e));
                 }
             }
+
             Ok(LoopControl::NextCommand)
         }
     }

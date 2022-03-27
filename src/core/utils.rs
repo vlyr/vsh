@@ -1,6 +1,8 @@
 use crossterm::{cursor, execute, style::Print};
 use std::env;
+use std::error::Error;
 use std::fmt;
+use std::fs;
 use std::io::Stdout;
 
 pub fn error_handler<T: fmt::Display>(stdout: &mut Stdout, msg: &T) {
@@ -32,4 +34,22 @@ pub fn append_to_path<S: AsRef<str>>(dest: S, src: S) -> String {
     }
 
     components.join("/")
+}
+
+pub fn get_path_binaries() -> Result<Vec<String>, Box<dyn Error>> {
+    Ok(env::var("PATH")?
+        .split(":")
+        .map(|path| match fs::read_dir(path) {
+            Ok(dir_entries) => dir_entries
+                .map(|entry| match entry {
+                    Ok(file) => file.file_name().to_str().unwrap().to_string(),
+                    Err(_) => String::new(),
+                })
+                .collect(),
+
+            Err(_) => vec![],
+        })
+        .flatten()
+        .filter(|name| !name.is_empty())
+        .collect())
 }

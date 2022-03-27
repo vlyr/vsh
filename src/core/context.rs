@@ -1,7 +1,7 @@
 use crate::core::completion::*;
 use crossterm::cursor;
 use crossterm::execute;
-use crossterm::style::Print;
+use crossterm::style::{Attribute, Color, Print, Stylize};
 
 use std::env;
 use std::error::Error;
@@ -65,7 +65,20 @@ impl Context {
 
         if let CompletionState::Active(ref state) = self.completion_state {
             for completion in state.completions() {
-                execute!(stdout, Print(completion), Print(" ")).unwrap();
+                let completion_path: &Path = completion.as_ref();
+
+                let completion_str = match completion_path.is_dir() {
+                    true => format!(
+                        "{}",
+                        completion
+                            .clone()
+                            .with(Color::Blue)
+                            .attribute(Attribute::Bold)
+                    ),
+                    false => completion.into(),
+                };
+
+                execute!(stdout, Print(completion_str), Print(" ")).unwrap();
             }
         }
 

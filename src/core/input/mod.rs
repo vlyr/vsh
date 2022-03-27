@@ -46,7 +46,7 @@ pub fn handle_key(
             match context.completion_state() {
                 &CompletionState::Active(ref _state) => (),
                 &CompletionState::Inactive => {
-                    context.completion_state_mut().dir_completions();
+                    context.set_dir_completions();
                     context.print_completions(stdout);
                 }
             }

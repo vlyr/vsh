@@ -85,6 +85,10 @@ impl Context {
         execute!(stdout, cursor::RestorePosition, cursor::MoveUp(1)).unwrap();
     }
 
+    pub fn set_dir_completions(&mut self) {
+        self.completion_state.dir_completions(&self.command_buffer);
+    }
+
     pub fn current_dir_str(&self) -> String {
         let dir_str = self.current_dir().display().to_string();
         let home_dir = env::var("HOME").expect("Failed getting environment variable $HOME");

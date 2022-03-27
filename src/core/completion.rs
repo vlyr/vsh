@@ -69,12 +69,19 @@ impl CompletionState {
         mem::swap(self, &mut CompletionState::Inactive);
     }
 
-    pub fn dir_completions(&mut self) {
+    pub fn dir_completions(&mut self, command_buffer: &String) {
+        let args: Vec<&str> = command_buffer.split(" ").collect();
+        let last_arg = args.get(args.len() - 1).unwrap_or(&"").trim();
+
         let path = std::env::current_dir().unwrap();
 
         let mut file_names = vec![];
 
-        for file in fs::read_dir(path).unwrap().filter_map(|entry| entry.ok()) {
+        for file in fs::read_dir(path)
+            .unwrap()
+            .filter_map(|entry| entry.ok())
+            .filter(|file| file.file_name().to_str().unwrap().starts_with(last_arg))
+        {
             let name = file.file_name();
             file_names.push(name.clone());
         }
